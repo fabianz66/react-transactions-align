@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect } from 'vitest';
-import { Parser } from '../parser';
+import { getCSVTransactions } from '../parser';
 import BNCR_V1_CSV from '../fixtures/BNCR_v1.csv?raw';
 import BAC_V1_CSV from '../fixtures/BAC_v1.csv?raw';
 
@@ -14,7 +14,7 @@ describe('Parser', () => {
       const file = new File([blob], 'BNCR_v1.csv', { type: 'text/csv' });
 
       // Parse the file.
-      const transactions = await Parser.getCSVTransactions(file);
+      const transactions = await getCSVTransactions(file);
 
       // Verify we have exactly 49 transactions.
       expect(transactions).toHaveLength(49);
@@ -26,7 +26,7 @@ describe('Parser', () => {
       const file = new File([blob], 'BNCR_v1.csv', { type: 'text/csv' });
 
       // Parse the file.
-      const transactions = await Parser.getCSVTransactions(file);
+      const transactions = await getCSVTransactions(file);
 
       // Verify the first transaction's values.
       // 560;29/01/2026;33107384;5,000.00;;PETER 61406974/HENRY IVES;
@@ -59,7 +59,7 @@ describe('Parser', () => {
       const file = new File([blob], 'BAC_v1.csv', { type: 'text/csv' });
 
       // Parse the file.
-      const transactions = await Parser.getCSVTransactions(file);
+      const transactions = await getCSVTransactions(file);
 
       // Verify we have exactly 28 transactions.
       expect(transactions).toHaveLength(28);
@@ -71,7 +71,7 @@ describe('Parser', () => {
       const file = new File([blob], 'BAC_v1.csv', { type: 'text/csv' });
 
       // Parse the file.
-      const transactions = await Parser.getCSVTransactions(file);
+      const transactions = await getCSVTransactions(file);
 
       // Verify the first transaction's values.
       //20/01/2026, 71902474, CP, CITYMALL COMPASS, 2100.00, 0.00, 96672.29 
