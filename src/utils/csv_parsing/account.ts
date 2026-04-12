@@ -1,0 +1,1 @@
+// Placeholder for Account class - convert from Python account.py when implemented
