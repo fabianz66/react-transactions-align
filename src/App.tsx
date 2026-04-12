@@ -1,65 +1,84 @@
-import { useState } from 'react';
-import { Parser } from './utils/csv_parsing/parser';
-import { Transaction } from './utils/csv_parsing/transaction';
-import './App.css';
+import React, { useState, ChangeEvent } from 'react';
 
-function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
+/**
+ * App component that allows a user to upload a CSV file and 
+ * automatically downloads a new CSV containing only the first line.
+ */
+const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-
-    setLoading(true);
+    console.log('File selected:', file?.name);
     setError(null);
 
-    try {
-      const parsedTransactions = await Parser.parse(file);
-      setTransactions(parsedTransactions);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to parse file');
-    } finally {
-      setLoading(false);
+    if (!file) return;
+
+    // Basic validation to ensure the file is a CSV
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      setError('Please upload a valid .csv file.');
+      return;
     }
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const content = e.target?.result;
+      if (typeof content !== 'string') return;
+
+      // Extract the first line (typically the CSV header)
+      const firstLine = content.split(/\r?\n/)[0];
+      console.log('Extracted header:', firstLine);
+
+      if (firstLine === undefined || content.trim() === '') {
+        setError('The uploaded file appears to be empty.');
+        return;
+      }
+
+      // Create a new Blob for the output file
+      const blob = new Blob([firstLine], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+
+      // Create a temporary link to trigger the download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `header_${file.name}`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up the DOM and memory
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    };
+
+    reader.onerror = (e) => {
+      console.error('FileReader error:', e);
+      setError('Error reading file. Please try again.');
+    };
+    reader.readAsText(file);
   };
 
   return (
-    <div className="App">
-      <h1>CSV Transaction Parser</h1>
-      <input type="file" accept=".csv" onChange={handleFileUpload} />
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {transactions.length > 0 && (
-        <div>
-          <h2>Parsed Transactions</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Is Expense</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((tx, index) => (
-                <tr key={index}>
-                  <td>{tx.id}</td>
-                  <td>{tx.date.toDateString()}</td>
-                  <td>{tx.amount}</td>
-                  <td>{tx.description}</td>
-                  <td>{tx.isExpense ? 'Yes' : 'No'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <main style={{ padding: '2rem', textAlign: 'center', fontFamily: 'system-ui, sans-serif' }}>
+      <h1>CSV Header Extractor</h1>
+      <p>Select a CSV file to download a version containing only its first line.</p>
+      
+      <div style={{ marginTop: '2rem' }}>
+        <input 
+          type="file" 
+          accept=".csv" 
+          onChange={handleFileUpload} 
+          style={{ fontSize: '1rem' }}
+        />
+      </div>
+
+      {error && (
+        <p style={{ color: '#d32f2f', marginTop: '1rem' }} role="alert">
+          {error}
+        </p>
       )}
-    </div>
+    </main>
   );
-}
+};
 
 export default App;
