@@ -1,4 +1,4 @@
-import { Transaction } from './transaction';
+import { Transaction } from '../models/transaction';
 import { diffStringsUnified } from '@vitest/utils/diff';
 
 // Constants are kept at the module level (not exported if only used here)
