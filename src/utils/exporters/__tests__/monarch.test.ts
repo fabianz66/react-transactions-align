@@ -1,6 +1,12 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect } from 'vitest';
 import { Transaction } from '../../models/transaction';
 import { exportToMonarch } from '../../exporters/monarch';
+import { getCSVTransactions } from '../../csv_parsing/parser';
+import BNCR_V1_CSV from '../../fixtures/BNCR_v1.csv?raw';
+import BAC_V1_CSV from '../../fixtures/BAC_v1.csv?raw';
 
 describe('exportToMonarch', () => {
   const mockDate = new Date('2023-10-27T12:00:00Z');
@@ -47,5 +53,43 @@ describe('exportToMonarch', () => {
     const lines = csv.split('\n');
 
     expect(lines[1]).toContain(',Auto & Transport,');
+  });
+
+  it('should correctly export BNCR v1 transactions', async() => {
+    
+    // Get transactions from the BNCR v1 CSV fixture.
+    const blob = new Blob([BNCR_V1_CSV], { type: 'text/csv' });
+    const file = new File([blob], 'BNCR_v1.csv', { type: 'text/csv' });
+    const transactions = await getCSVTransactions(file);
+
+    // Export to Monarch CSV format.
+    const monarchCSV = exportToMonarch(transactions);
+    const monarchTransactions = monarchCSV.split('\n');
+    expect(monarchTransactions).toHaveLength(50); // 49 transactions + 1 header
+
+    // Verify the first transaction's values.
+    expect(monarchTransactions[1]).toBe('2026-01-29,"PETER 61406974/HENRY IVES",Uncategorized,"PETER 61406974/HENRY IVES",-5000');
+
+    // Verify the last transaction's values.
+    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-01-05,"ARIPAGOCAMBIODEDIVISA/OSCARPARKER",Transfer,"ARIPAGOCAMBIODEDIVISA/OSCARPARKER",1239700');
+  });
+
+  it('should correctly export BAC v1 transactions', async() => {
+    
+    // Get transactions from the BAC v1 CSV fixture.
+    const blob = new Blob([BAC_V1_CSV], { type: 'text/csv' });
+    const file = new File([blob], 'BAC_v1.csv', { type: 'text/csv' });
+    const transactions = await getCSVTransactions(file);
+
+    // Export to Monarch CSV format.
+    const monarchCSV = exportToMonarch(transactions);
+    const monarchTransactions = monarchCSV.split('\n');
+    expect(monarchTransactions).toHaveLength(29); // 28 transactions + 1 header
+
+    // Verify the first transaction's values.
+    expect(monarchTransactions[1]).toBe('2026-01-20,"CITYMALL COMPASS",Uncategorized,"CITYMALL COMPASS",-2100');
+
+    // Verify the last transaction's values.
+    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-04-08,"IVA -Google YouTubePremiu",Transfer,"IVA -Google YouTubePremiu",1113.92');
   });
 });
