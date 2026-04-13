@@ -3,8 +3,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { getCSVTransactions } from '../parser';
-import BNCR_V1_CSV from '../fixtures/BNCR_v1.csv?raw';
-import BAC_V1_CSV from '../fixtures/BAC_v1.csv?raw';
+import BNCR_V1_CSV from './fixtures/BNCR_v1.csv?raw';
+import BAC_V1_CSV from './fixtures/BAC_v1.csv?raw';
 
 describe('Parser', () => {
   describe('BNCR v1 file parsing', () => {
