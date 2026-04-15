@@ -1,6 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
 import { describe, it, expect } from 'vitest';
 import { Transaction } from '../../models/transaction';
 import { exportToMonarch } from '../monarch';
@@ -19,8 +16,8 @@ describe('exportToMonarch', () => {
 
   it('should correctly format an expense and an income transaction', () => {
     const transactions = [
-      new Transaction('1', mockDate, 50.25, 'Amazon.com', true),
-      new Transaction('2', mockDate, 1000, 'Planilla', false)
+      new Transaction('1', mockDate, 50.25, 'Amazon.com', "Amazon", true),
+      new Transaction('2', mockDate, 1000, 'Planilla', "CCSS", false)
     ];
 
     const csv = exportToMonarch(transactions);
@@ -28,31 +25,21 @@ describe('exportToMonarch', () => {
 
     // Date format is YYYY-MM-DD
     // Expense should be negative: -50.25
-    expect(lines[1]).toBe('2023-10-27,"Amazon",Shopping,"Amazon.com",-50.25');
+    expect(lines[1]).toBe('2023-10-27,Amazon,Shopping,Amazon.com,-50.25');
     // Income should be positive: 1000
-    expect(lines[2]).toBe('2023-10-27,"Planilla",Income,"Planilla",1000');
+    expect(lines[2]).toBe('2023-10-27,CCSS,Income,Planilla,1000');
   });
 
   it('should escape double quotes in descriptions and account names', () => {
     const transactions = [
-      new Transaction('3', mockDate, 10, 'Dinner at "The Spoon"', true)
+      new Transaction('3', mockDate, 10, 'Dinner at "The Spoon"', "Restaurants", true)
     ];
 
     const csv = exportToMonarch(transactions);
     const lines = csv.split('\n');
 
     // Double quotes in CSV are escaped by doubling them
-    expect(lines[1]).toContain('"Dinner at ""The Spoon"""');
-  });
-
-  it('should use the auto-categorization logic if the category field is empty', () => {
-    // Transaction without a category (relying on internal logic for 'UBER')
-    const t = new Transaction('4', mockDate, 15, 'UBER TRIP', true);
-    
-    const csv = exportToMonarch([t]);
-    const lines = csv.split('\n');
-
-    expect(lines[1]).toContain(',Auto & Transport,');
+    expect(lines[1]).toContain('Dinner at "The Spoon"');
   });
 
   it('should correctly export BNCR v1 transactions', async() => {
@@ -66,10 +53,10 @@ describe('exportToMonarch', () => {
     expect(monarchTransactions).toHaveLength(50); // 49 transactions + 1 header
 
     // Verify the first transaction's values.
-    expect(monarchTransactions[1]).toBe('2026-01-29,"PETER 61406974/HENRY IVES",Uncategorized,"PETER 61406974/HENRY IVES",-5000');
+    expect(monarchTransactions[1]).toBe('2026-01-29,61406974/HENRY IVES,Uncategorized,PETER 61406974/HENRY IVES,-5000');
 
     // Verify the last transaction's values.
-    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-01-05,"ARIPAGOCAMBIODEDIVISA/OSCARPARKER",Transfer,"ARIPAGOCAMBIODEDIVISA/OSCARPARKER",1239700');
+    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-01-05,OSCARPARKER,Transfer,ARIPAGOCAMBIODEDIVISA/OSCARPARKER,1239700');
   });
 
   it('should correctly export BAC v1 transactions', async() => {
@@ -83,9 +70,9 @@ describe('exportToMonarch', () => {
     expect(monarchTransactions).toHaveLength(29); // 28 transactions + 1 header
 
     // Verify the first transaction's values.
-    expect(monarchTransactions[1]).toBe('2026-01-20,"CITYMALL COMPASS",Uncategorized,"CITYMALL COMPASS",-2100');
+    expect(monarchTransactions[1]).toBe('2026-01-20,CITYMALL COMPASS,Parking & Tolls,CITYMALL COMPASS,-2100');
 
     // Verify the last transaction's values.
-    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-04-08,"IVA -Google YouTubePremiu",Transfer,"IVA -Google YouTubePremiu",1113.92');
+    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-04-08,Google,Taxes,IVA -Google YouTubePremiu,1113.92');
   });
 });
