@@ -8,30 +8,10 @@ const BNCR_V1_HEADER = 'oficina;fechaMovimiento;numeroDocumento;debito;credito;d
 const BAC_V1_HEADER_INDEX = 3;
 const BAC_V1_HEADER = 'Fecha de Transaccin, Referencia de Transaccin, Cdigo de Transaccin, Descripcin de Transaccin, Dbito de Transaccin, Crdito de Transaccin, Balance de Transaccin';
 
-/**
- * Publicly exported function to handle the file reading and parsing.
- */
-export async function getCSVTransactions(file: File): Promise<Transaction[]> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const csv = e.target?.result as string;          
-        const result = getCSVTransactionsAux(csv);                  
-        resolve(result);  
-      } catch (error) {
-        reject(error);
-      }
-    };
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsText(file, 'UTF-8');
-  });
-}
-
-function getCSVTransactionsAux(csv: string): Transaction[] {
-  // Remove any replacement characters
-  csv = csv.replace(/\uFFFD/g, ""); 
-  const csvLines = csv.split(/\r?\n/).filter(line => line.trim().length > 0);
+export function getCSVTransactions(csvContent: string): Transaction[] {
+  // Remove any replacement characters.
+  csvContent = csvContent.replace(/\uFFFD/g, ""); 
+  const csvLines = csvContent.split(/\r?\n/).filter(line => line.trim().length > 0);
 
   if (isBNCRv1(csvLines)) {
     return getBNCRv1Transactions(csvLines);

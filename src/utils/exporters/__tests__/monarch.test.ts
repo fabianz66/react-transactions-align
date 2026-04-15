@@ -58,9 +58,7 @@ describe('exportToMonarch', () => {
   it('should correctly export BNCR v1 transactions', async() => {
     
     // Get transactions from the BNCR v1 CSV fixture.
-    const blob = new Blob([BNCR_V1_CSV], { type: 'text/csv' });
-    const file = new File([blob], 'BNCR_v1.csv', { type: 'text/csv' });
-    const transactions = await getCSVTransactions(file);
+    const transactions = getCSVTransactions(BNCR_V1_CSV);
 
     // Export to Monarch CSV format.
     const monarchCSV = exportToMonarch(transactions);
@@ -77,9 +75,7 @@ describe('exportToMonarch', () => {
   it('should correctly export BAC v1 transactions', async() => {
     
     // Get transactions from the BAC v1 CSV fixture.
-    const blob = new Blob([BAC_V1_CSV], { type: 'text/csv' });
-    const file = new File([blob], 'BAC_v1.csv', { type: 'text/csv' });
-    const transactions = await getCSVTransactions(file);
+    const transactions = getCSVTransactions(BAC_V1_CSV);
 
     // Export to Monarch CSV format.
     const monarchCSV = exportToMonarch(transactions);

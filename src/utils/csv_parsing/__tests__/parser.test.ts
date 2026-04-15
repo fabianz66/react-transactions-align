@@ -1,6 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
 import { describe, it, expect } from 'vitest';
 import { getCSVTransactions } from '../parser';
 import BNCR_V1_CSV from '../../fixtures/BNCR_v1.csv?raw';
@@ -10,23 +7,14 @@ describe('Parser', () => {
   describe('BNCR v1 file parsing', () => {
     it('should load all transactions', async () => {
       // Create a File object from the CSV string.
-      const blob = new Blob([BNCR_V1_CSV], { type: 'text/csv' });
-      const file = new File([blob], 'BNCR_v1.csv', { type: 'text/csv' });
-
-      // Parse the file.
-      const transactions = await getCSVTransactions(file);
+      const transactions = getCSVTransactions(BNCR_V1_CSV);
 
       // Verify we have exactly 49 transactions.
       expect(transactions).toHaveLength(49);
     });
 
     it('should load the correct transaction values', async () => {
-      // Create a File object from the CSV string.
-      const blob = new Blob([BNCR_V1_CSV], { type: 'text/csv' });
-      const file = new File([blob], 'BNCR_v1.csv', { type: 'text/csv' });
-
-      // Parse the file.
-      const transactions = await getCSVTransactions(file);
+      const transactions = getCSVTransactions(BNCR_V1_CSV);
 
       // Verify the first transaction's values.
       // 560;29/01/2026;33107384;5,000.00;;PETER 61406974/HENRY IVES;
@@ -54,24 +42,14 @@ describe('Parser', () => {
 
   describe('BAC v1 file parsing', () => {
     it('should load all transactions', async () => {
-      // Create a File object from the CSV string.
-      const blob = new Blob([BAC_V1_CSV], { type: 'text/csv' });
-      const file = new File([blob], 'BAC_v1.csv', { type: 'text/csv' });
-
-      // Parse the file.
-      const transactions = await getCSVTransactions(file);
+      const transactions = getCSVTransactions(BAC_V1_CSV);
 
       // Verify we have exactly 28 transactions.
       expect(transactions).toHaveLength(28);
     });
 
     it('should load the correct transaction values', async () => {
-      // Create a File object from the CSV string.
-      const blob = new Blob([BAC_V1_CSV], { type: 'text/csv' });
-      const file = new File([blob], 'BAC_v1.csv', { type: 'text/csv' });
-
-      // Parse the file.
-      const transactions = await getCSVTransactions(file);
+      const transactions = getCSVTransactions(BAC_V1_CSV);
 
       // Verify the first transaction's values.
       //20/01/2026, 71902474, CP, CITYMALL COMPASS, 2100.00, 0.00, 96672.29 

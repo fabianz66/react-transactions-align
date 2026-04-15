@@ -1,4 +1,6 @@
 import React, { useState, ChangeEvent } from 'react';
+import { getCSVTransactions } from './utils/csv_parsing/parser';
+import { exportToMonarch } from './utils/exporters/monarch';
 
 /**
  * App component that allows a user to upload a CSV file and 
@@ -21,22 +23,19 @@ const App: React.FC = () => {
     }
 
     const reader = new FileReader();
-
     reader.onload = (e) => {
-      const content = e.target?.result;
-      if (typeof content !== 'string') return;
+      const originalCSV = e.target?.result;
+      if (typeof originalCSV !== 'string') return;
 
-      // Extract the first line (typically the CSV header)
-      const firstLine = content.split(/\r?\n/)[0];
-      console.log('Extracted header:', firstLine);
+      // Parse transactions.
+      const transactions = getCSVTransactions(originalCSV);
+      console.log('Parsed transactions:', transactions);
 
-      if (firstLine === undefined || content.trim() === '') {
-        setError('The uploaded file appears to be empty.');
-        return;
-      }
+      const monarchCSV = exportToMonarch(transactions);
+      console.log('Monarch CSV:', monarchCSV);   
 
       // Create a new Blob for the output file
-      const blob = new Blob([firstLine], { type: 'text/csv' });
+      const blob = new Blob([monarchCSV], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
 
       // Create a temporary link to trigger the download
