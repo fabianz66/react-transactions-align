@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from 'react';
-import { getCSVTransactions } from './utils/csv_parsing/parser';
-import { exportToMonarch } from './utils/exporters/monarch';
+import { getCSVTransactions } from './lib/csv_parsing/parser';
+import { exportToMonarch } from './lib/exporters/monarch';
 
 /**
  * App component that allows a user to upload a CSV file and 

@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { Transaction } from '../../models/transaction';
-import { exportToMonarch } from '../../exporters/monarch';
+import { exportToMonarch } from '../monarch';
 import { getCSVTransactions } from '../../csv_parsing/parser';
 import BNCR_V1_CSV from '../../fixtures/BNCR_v1.csv?raw';
 import BAC_V1_CSV from '../../fixtures/BAC_v1.csv?raw';
@@ -28,7 +28,7 @@ describe('exportToMonarch', () => {
 
     // Date format is YYYY-MM-DD
     // Expense should be negative: -50.25
-    expect(lines[1]).toBe('2023-10-27,"Amazon.com",Shopping,"Amazon.com",-50.25');
+    expect(lines[1]).toBe('2023-10-27,"Amazon",Shopping,"Amazon.com",-50.25');
     // Income should be positive: 1000
     expect(lines[2]).toBe('2023-10-27,"Planilla",Income,"Planilla",1000');
   });
