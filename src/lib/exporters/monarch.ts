@@ -26,20 +26,32 @@ export function exportToMonarch(transactions: Transaction[]): string {
  * Default categorization logic based on common keywords for Costa Rican banks
  * and Monarch Money default categories.
  */
-export function categorize(t : Transaction): string {
+function categorize(t : Transaction): string {
   const desc = t.description.toUpperCase();
 
-  if (!t.isExpense) {
-    if (desc.includes('NOMINA') || desc.includes('PLANILLA') || desc.includes('INTERES')) return 'Income';
-    return 'Transfer';
-  }
-
-  if (desc.includes('AMAZON') || desc.includes('APPLE') || desc.includes('MARKET')) return 'Shopping';
-  if (desc.includes('UBER') || desc.includes('DIDI') || desc.includes('GASOLIN') || desc.includes('PEAJE')) return 'Auto & Transport';
-  if (desc.includes('RESTAURANTE') || desc.includes('CAFE') || desc.includes('SPOON') || desc.includes('MCDONALDS')) return 'Restaurants';
-  if (desc.includes('SUPER') || desc.includes('AUTO MERCADO') || desc.includes('VINDI') || desc.includes('GROCERY') || desc.includes('MASXMENOS') || desc.includes('PALI')) return 'Groceries';
-  if (desc.includes('ALQUILER') || desc.includes('RENT') || desc.includes('CONDOMINIO')) return 'Housing';
-  if (desc.includes('SERVICIO') || desc.includes('TELEFONO') || desc.includes('ICE ') || desc.includes('AYA ') || desc.includes('SUSCRIPCION')) return 'Bills & Utilities';
+  if (includesAnyWord(desc, ['NOMINA', 'PLANILLA'])) return 'Income';
+  if (includesAnyWord(desc, ['INTERES', 'INTERESES'])) return 'Interest';
+  if (includesAnyWord(desc, ['COMISION'])) return 'Financial Fees';
+  if (includesAnyWord(desc, ['IVA'])) return 'Taxes';
+  if (includesAnyWord(desc, ['ARIPAGOCAMBIODEDIVISA', 'ARI-DEBITO', 'TRANSFER', 'ATM'])) return 'Transfer';  
+  if (includesAnyWord(desc, ['ICELEC', 'ELECTRICIDAD', 'LUZ', 'SERVICIOS'])) return 'Gas & Electric';
+  if (includesAnyWord(desc, ['AGUA'])) return 'Water';
+  if (includesAnyWord(desc, ['LIBERTY'])) return 'Internet & Cable';
+  if (includesAnyWord(desc, ['ICETEL', 'TELEFONO', 'CELULAR'])) return 'Phone';  
+  if (includesAnyWord(desc, ['COMIDA', 'GROCERIES', 'SUPER', 'AUTO MERCADO', 'VINDI', 'GROCERY', 'MASXMENOS', 'PALI', 'FERIA'])) return 'Groceries';
+  if (includesAnyWord(desc, ['FERRETERIA'])) return 'Home Improvement';
+  if (includesAnyWord(desc, ['CCSS'])) return 'Medical';
+  if (includesAnyWord(desc, ['DENTISTA', 'DENTIST'])) return 'Dentist'; 
+  if (includesAnyWord(desc, ['PELO', 'CABELLO'])) return 'Personal';
+  if (includesAnyWord(desc, ['AMAZON', 'APPLE', 'MARKET'])) return 'Shopping';
+  if (includesAnyWord(desc, ['UBER', 'DIDI', 'GASOLIN', 'PEAJE'])) return 'Auto & Transport';
+  if (includesAnyWord(desc, ['RESTAURANTE', 'CAFE', 'SPOON', 'MCDONALDS'])) return 'Restaurants';
+  if (includesAnyWord(desc, ['ALQUILER', 'RENTA', 'RENT', 'CONDOMINIO'])) return 'Housing';
+  if (includesAnyWord(desc, ['LAVACAR', 'CARRO'])) return 'Auto Maintenance';
+  if (includesAnyWord(desc, ['COMPASS','PARKING', 'PARQUEO'])) return 'Parking & Tolls';
+  if (includesAnyWord(desc, ['GASOLINERA', 'SERVICENTRO'])) return 'Gas';
+  if (includesAnyWord(desc, ['REGALO'])) return 'Gifts';
+  if (includesAny(desc, ['DISNEY', 'NETFLIX', 'HBO', 'MAX', 'YOUTUBE', 'SPOTIFY', 'HULU', 'PARAMOUNT', 'PRIME VIDEO', 'APPLE TV', 'PEACOCK', 'TIDAL', 'PANDORA', 'CRUNCHYROLL', 'APPLE MUSIC'])) return 'Entertainment & Recreation';
   
   return 'Uncategorized';
 }
@@ -47,24 +59,24 @@ export function categorize(t : Transaction): string {
 /**
  * Guesses the merchant name from the transaction description.
  */
-export function getMerchant(t: Transaction): string {
+function getMerchant(t: Transaction): string {
   const desc = t.description.toUpperCase();
 
   // Specific keyword-based merchants
-  if (desc.includes('ICETEL')) return 'ICETEL';
-  if (desc.includes('CCSS')) return 'CCSS';
-  if (desc.includes('LIBERTY')) return 'Liberty';
-  if (desc.includes('ICELEC')) return 'ICELEC';
-  if (desc.includes('AMAZON')) return 'Amazon';
-  if (desc.includes('APPLE')) return 'Apple';
-  if (desc.includes('UBER')) return 'Uber';
-  if (desc.includes('DIDI')) return 'Didi';
-  if (desc.includes('MCDONALDS')) return "McDonald";
-  if (desc.includes('SPOON')) return 'Spoon';
-  if (desc.includes('AUTO MERCADO')) return 'Auto Mercado';
-  if (desc.includes('VINDI')) return 'Vindi';
-  if (desc.includes('MASXMENOS')) return 'Mas x Menos';
-  if (desc.includes('PALI')) return 'Pali';
+  if (includesAnyWord(desc, ['ICETEL'])) return 'ICETEL';
+  if (includesAnyWord(desc, ['CCSS'])) return 'CCSS';
+  if (includesAnyWord(desc, ['LIBERTY'])) return 'Liberty';
+  if (includesAnyWord(desc, ['ICELEC'])) return 'ICELEC';
+  if (includesAnyWord(desc, ['AMAZON'])) return 'Amazon';
+  if (includesAnyWord(desc, ['APPLE'])) return 'Apple';
+  if (includesAnyWord(desc, ['UBER'])) return 'Uber';
+  if (includesAnyWord(desc, ['DIDI'])) return 'Didi';
+  if (includesAnyWord(desc, ['MCDONALDS'])) return "McDonalds";
+  if (includesAnyWord(desc, ['SPOON'])) return 'Spoon';
+  if (includesAnyWord(desc, ['AUTO MERCADO'])) return 'Auto Mercado';
+  if (includesAnyWord(desc, ['VINDI'])) return 'Vindi';
+  if (includesAnyWord(desc, ['MASXMENOS'])) return 'Mas x Menos';
+  if (includesAnyWord(desc, ['PALI'])) return 'Pali';
 
   // Pattern: "00000000/ TEXT" - extracts the phone number and subsequent text
   // Matches 8 digits, followed by '/', then any combination of alphanumeric, spaces, slashes, hyphens, or periods.
@@ -82,4 +94,26 @@ export function getMerchant(t: Transaction): string {
     return textSlashTextMatch[1].trim();
   }
   return t.description;
+}
+
+/**
+ * Checks if any of the provided keywords exist in the text as a whole word.
+ */
+function includesAnyWord(text: string, keywords: string[]): boolean {
+  return keywords.some(keyword => {
+    // Escape special regex characters in the keyword
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}\\b`, 'i').test(text);
+  });
+}
+
+/**
+ * Checks if any of the provided keywords exist in the text NOT NECESSARILY as a whole word.
+ */
+function includesAny(text: string, keywords: string[]): boolean {
+  return keywords.some(keyword => {
+    // Escape special regex characters in the keyword
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(escaped, 'i').test(text);
+  });
 }
