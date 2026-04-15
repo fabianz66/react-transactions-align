@@ -50,6 +50,11 @@ export function categorize(t : Transaction): string {
 export function getMerchant(t: Transaction): string {
   const desc = t.description.toUpperCase();
 
+  // Specific keyword-based merchants
+  if (desc.includes('ICETEL')) return 'ICETEL';
+  if (desc.includes('CCSS')) return 'CCSS';
+  if (desc.includes('LIBERTY')) return 'Liberty';
+  if (desc.includes('ICELEC')) return 'ICELEC';
   if (desc.includes('AMAZON')) return 'Amazon';
   if (desc.includes('APPLE')) return 'Apple';
   if (desc.includes('UBER')) return 'Uber';
@@ -60,8 +65,21 @@ export function getMerchant(t: Transaction): string {
   if (desc.includes('VINDI')) return 'Vindi';
   if (desc.includes('MASXMENOS')) return 'Mas x Menos';
   if (desc.includes('PALI')) return 'Pali';
-  if (desc.includes('ICE ')) return 'ICE';
-  if (desc.includes('AYA ')) return 'AyA';
 
+  // Pattern: "00000000/ TEXT" - extracts the phone number and subsequent text
+  // Matches 8 digits, followed by '/', then any combination of alphanumeric, spaces, slashes, hyphens, or periods.
+  const phoneNumberPattern = /(\d{8}\/[A-Z0-9\s\/\-\.]+)/;
+  const phoneNumberMatch = desc.match(phoneNumberPattern);
+  if (phoneNumberMatch && phoneNumberMatch[1]) {
+    return phoneNumberMatch[1].trim();
+  }
+
+  // Pattern: "TEXT1/ TEXT2" - extracts the second part after the last '/'
+  // Matches any text, followed by '/', then captures the subsequent text.
+  const textSlashTextPattern = /.*\/([A-Z0-9\s\/\-\.]+)/;
+  const textSlashTextMatch = desc.match(textSlashTextPattern);
+  if (textSlashTextMatch && textSlashTextMatch[1]) {
+    return textSlashTextMatch[1].trim();
+  }
   return t.description;
 }
