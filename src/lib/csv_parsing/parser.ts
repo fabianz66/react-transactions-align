@@ -1,6 +1,6 @@
 import { Transaction } from '../models/transaction';
 import { diffStringsUnified } from '@vitest/utils/diff';
-import { getMerchant } from './merchant_utils';
+import { getMerchant } from '../utils/merchant_utils';
 
 // Constants are kept at the module level (not exported if only used here)
 const BNCR_V1_HEADER_INDEX = 0;

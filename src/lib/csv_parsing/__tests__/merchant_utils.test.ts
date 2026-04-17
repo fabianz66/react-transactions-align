@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getMerchant } from '../merchant_utils';
+import { getMerchant } from '../../utils/merchant_utils';
 import MERCHANTS_CATEGORIES_V1_CSV from '../../fixtures/MERCHANTS_CATEGORIES_V1.csv?raw';
 
 describe('getMerchant', () => {
