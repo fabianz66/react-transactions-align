@@ -73,6 +73,6 @@ describe('exportToMonarch', () => {
     expect(monarchTransactions[1]).toBe('2026-01-20,CITYMALL COMPASS,Parking & Tolls,CITYMALL COMPASS,-2100');
 
     // Verify the last transaction's values.
-    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-04-08,Google,Taxes,IVA -Google YouTubePremiu,1113.92');
+    expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-04-08,GOOGLE,Taxes,IVA -Google YouTubePremiu,1113.92');
   });
 });
