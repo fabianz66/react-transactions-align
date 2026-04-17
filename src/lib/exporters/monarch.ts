@@ -44,7 +44,7 @@ function categorize(t : Transaction): string {
   if (includesAnyWord(desc, ['AMAZON', 'APPLE', 'MARKET'])) return 'Shopping';
   if (includesAnyWord(desc, ['UBER', 'GASOLINA', 'PEAJE'])) return 'Auto & Transport';
   if (includesAnyWord(desc, ['RESTAURANTE', 'CAFE', 'SPOON', 'MCDONALDS', 'DIDI'])) return 'Restaurants';
-  if (includesAnyWord(desc, ['ALQUILER', 'RENTA', 'RENT', 'CONDOMINIO'])) return 'Housing';
+  if (includesAnyWord(desc, ['ALQUILER', 'RENTA', 'RENT'])) return 'Rent';
   if (includesAnyWord(desc, ['LAVACAR', 'CARRO'])) return 'Auto Maintenance';
   if (includesAnyWord(desc, ['COMPASS','QUICKPASS','PARKING', 'PARQUEO'])) return 'Parking & Tolls';
   if (includesAnyWord(desc, ['GASOLINERA', 'SERVICENTRO'])) return 'Gas';
