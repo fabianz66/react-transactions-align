@@ -31,7 +31,7 @@ function categorize(t : Transaction): string {
   if (includesAnyWord(desc, ['INTERES', 'INTERESES'])) return 'Interest';
   if (includesAnyWord(desc, ['COMISION'])) return 'Financial Fees';
   if (includesAnyWord(desc, ['IVA'])) return 'Taxes';
-  if (includesAnyWord(desc, ['ARIPAGOCAMBIODEDIVISA', 'ARI-DEBITO', 'TRANSFER', 'ATM'])) return 'Transfer';  
+  if (includesAnyWord(desc, ['ARIPAGOCAMBIODEDIVISA', 'ARI-DEBITO', 'TRANSFER', 'ATM', 'TRANSFERENCIA'])) return 'Transfer';  
   if (includesAnyWord(desc, ['ICELEC', 'ELECTRICIDAD', 'LUZ', 'SERVICIOS'])) return 'Gas & Electric';
   if (includesAnyWord(desc, ['AGUA'])) return 'Water';
   if (includesAnyWord(desc, ['LIBERTY'])) return 'Internet & Cable';
@@ -46,9 +46,11 @@ function categorize(t : Transaction): string {
   if (includesAnyWord(desc, ['RESTAURANTE', 'CAFE', 'SPOON', 'MCDONALDS', 'DIDI'])) return 'Restaurants';
   if (includesAnyWord(desc, ['ALQUILER', 'RENTA', 'RENT', 'CONDOMINIO'])) return 'Housing';
   if (includesAnyWord(desc, ['LAVACAR', 'CARRO'])) return 'Auto Maintenance';
-  if (includesAnyWord(desc, ['COMPASS','PARKING', 'PARQUEO'])) return 'Parking & Tolls';
+  if (includesAnyWord(desc, ['COMPASS','QUICKPASS','PARKING', 'PARQUEO'])) return 'Parking & Tolls';
   if (includesAnyWord(desc, ['GASOLINERA', 'SERVICENTRO'])) return 'Gas';
   if (includesAnyWord(desc, ['REGALO'])) return 'Gifts';
+  if (includesAnyWord(desc, ['MATERNO','MATERNAL','ESCUELA'])) return 'Child Care';
+  if (includesAnyWord(desc, ['POLIZA'])) return 'Insurance';
   if (includesAny(desc, ['DISNEY', 'NETFLIX', 'HBO', 'MAX', 'YOUTUBE', 'SPOTIFY', 'HULU', 'PARAMOUNT', 'PRIME VIDEO', 'APPLE TV', 'PEACOCK', 'TIDAL', 'PANDORA', 'CRUNCHYROLL', 'APPLE MUSIC'])) return 'Entertainment & Recreation';
   
   return 'Uncategorized';

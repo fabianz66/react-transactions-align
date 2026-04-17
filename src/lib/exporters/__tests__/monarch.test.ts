@@ -4,6 +4,7 @@ import { exportToMonarch } from '../monarch';
 import { getCSVTransactions } from '../../csv_parsing/parser';
 import BNCR_V1_CSV from '../../fixtures/BNCR_v1.csv?raw';
 import BAC_V1_CSV from '../../fixtures/BAC_v1.csv?raw';
+import MERCHANTS_CATEGORIES_V1_CSV from '../../fixtures/merchants_categories_v1.csv?raw';
 
 describe('exportToMonarch', () => {
   const mockDate = new Date('2023-10-27T12:00:00Z');
@@ -74,5 +75,29 @@ describe('exportToMonarch', () => {
 
     // Verify the last transaction's values.
     expect(monarchTransactions[monarchTransactions.length - 1]).toBe('2026-04-08,GOOGLE,Taxes,IVA -Google YouTubePremiu,1113.92');
+  });
+
+  it('should correctly categorize transactions based on description', () => {
+    // Split the fixture content into lines, skip the header.
+    const rawLines = MERCHANTS_CATEGORIES_V1_CSV.split(/\r?\n/).slice(1);
+    
+    // Create a list of Transactions from the CSV data (columns 0 and 1).
+    const transactions = rawLines.map((line, index) => {
+      const columns = line.split(',');
+      const description = columns[0].trim();
+      const merchant = columns[1].trim();
+      return new Transaction(`test-id-${index}`, mockDate, 100, description, merchant, true);
+    });
+
+    const monarchCSV = exportToMonarch(transactions);
+    const monarchLines = monarchCSV.split('\n').slice(1); // Skip the Monarch header line
+
+    rawLines.forEach((line, index) => {
+      const columns = line.split(',');
+      const description = columns[0].trim();
+      const expectedCategory = columns[2].trim();
+      const actualCategory = monarchLines[index].split(',')[2].trim();
+      expect(actualCategory, `Failed for description: "${description}"`).toBe(expectedCategory);
+    });
   });
 });
