@@ -1,6 +1,7 @@
-import { Transaction } from '../models/transaction';
+import { CURRENCY_CRC, Transaction } from '../models/transaction';
 import { diffStringsUnified } from '@vitest/utils/diff';
 import { getMerchant } from '../utils/merchant_utils';
+import { parseDateStr } from '../utils/string_utils';
 
 // Constants are kept at the module level (not exported if only used here)
 const BNCR_V1_HEADER_INDEX = 0;
@@ -9,15 +10,15 @@ const BNCR_V1_HEADER = 'oficina;fechaMovimiento;numeroDocumento;debito;credito;d
 const BAC_V1_HEADER_INDEX = 3;
 const BAC_V1_HEADER = 'Fecha de Transaccin, Referencia de Transaccin, Cdigo de Transaccin, Descripcin de Transaccin, Dbito de Transaccin, Crdito de Transaccin, Balance de Transaccin';
 
-export function getCSVTransactions(csvContent: string): Transaction[] {
+export function getCSVTransactions(csvContent: string, currency: string = CURRENCY_CRC): Transaction[] {
   // Remove any replacement characters.
   csvContent = csvContent.replace(/\uFFFD/g, ""); 
   const csvLines = csvContent.split(/\r?\n/).filter(line => line.trim().length > 0);
 
   if (isBNCRv1(csvLines)) {
-    return getBNCRv1Transactions(csvLines);
+    return getBNCRv1Transactions(csvLines, currency);
   } else if (isBACv1(csvLines)) {
-    return getBACv1Transactions(csvLines);
+    return getBACv1Transactions(csvLines, currency);
   }    
 
   const bncrHeader = csvLines[BNCR_V1_HEADER_INDEX]?.trim();
@@ -27,7 +28,7 @@ export function getCSVTransactions(csvContent: string): Transaction[] {
   throw new Error(`Unsupported CSV format.\n\nBNCR Check:\n${bncrDiff}\n\nBAC Check:\n${bacDiff}`);
 }
 
-function getBACv1Transactions(csvLines: string[]): Transaction[] {    
+function getBACv1Transactions(csvLines: string[], currency: string): Transaction[] {    
   const transactions: Transaction[] = [];
 
   for (let i = BAC_V1_HEADER_INDEX + 1; i < csvLines.length; i++) {
@@ -40,10 +41,10 @@ function getBACv1Transactions(csvLines: string[]): Transaction[] {
       const tDescription = columns[3].trim(); 
       const tMerchant = getMerchant(tDescription);
       const isExpense = tDebit > 0;
-      const date = parseDate(tDate);
+      const date = parseDateStr(tDate);
       const amount = isExpense ? tDebit : tCredit;
 
-      transactions.push(new Transaction(tID, date, amount, tDescription, tMerchant, isExpense));
+      transactions.push(new Transaction(tID, date, amount, tDescription, tMerchant, isExpense, currency));
     } else {
       break; 
     }
@@ -51,7 +52,7 @@ function getBACv1Transactions(csvLines: string[]): Transaction[] {
   return transactions;
 }
 
-function getBNCRv1Transactions(csvLines: string[]): Transaction[] {
+function getBNCRv1Transactions(csvLines: string[], currency: string): Transaction[] {
   const transactions: Transaction[] = [];
 
   for (let i = BNCR_V1_HEADER_INDEX + 1; i < csvLines.length - 1 ; i++) {
@@ -64,10 +65,10 @@ function getBNCRv1Transactions(csvLines: string[]): Transaction[] {
       const tDescription = columns[5].trim();
       const tMerchant = getMerchant(tDescription);
       const isExpense = tDebit > 0;
-      const date = parseDate(tDate);
+      const date = parseDateStr(tDate);
       const amount = isExpense ? tDebit : tCredit;
       
-      transactions.push(new Transaction(tID, date, amount, tDescription, tMerchant, isExpense));
+      transactions.push(new Transaction(tID, date, amount, tDescription, tMerchant, isExpense, currency));
     } else {
       break; 
     }
@@ -83,12 +84,4 @@ function isBNCRv1(csvLines: string[]): boolean {
 function isBACv1(csvLines: string[]): boolean {
   const header = csvLines[BAC_V1_HEADER_INDEX]?.trim();
   return header === BAC_V1_HEADER;
-}
-
-function parseDate(dateStr: string): Date {
-  const parts = dateStr.split('/');
-  if (parts.length === 3) {
-    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-  }
-  return new Date(dateStr);
 }

@@ -36,3 +36,14 @@ export function includesAny(text: string, keywords: string[]): boolean {
     return new RegExp(escaped, 'i').test(text);
   });
 }
+
+/**
+ * Parses a date string in DD/MM/YYYY format or fallbacks to standard Date parsing.
+ */
+export function parseDateStr(dateStr: string): Date {
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  }
+  return new Date(dateStr);
+}
