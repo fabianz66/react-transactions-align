@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import React, { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
 import { getCSVTransactions } from './lib/csv_parsing/parser';
 import { exportToMonarch } from './lib/exporters/monarch';
 import { CURRENCY_CRC, CURRENCY_USD, Transaction } from './lib/models/transaction';
@@ -153,14 +153,12 @@ const App: React.FC = () => {
     try {
       const allFileContents = await Promise.all(fileReaders);
       let mergedCSV = '';
-      let header = '';
 
       allFileContents.forEach((content, index) => {
         const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
         if (lines.length === 0) return;
 
         if (index === 0) {
-          header = lines[0]; // Take header from the first file
           mergedCSV += lines.join('\n'); // Include all lines from the first file
         } else {
           // Append body (skip header) from subsequent files
